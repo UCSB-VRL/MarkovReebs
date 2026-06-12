@@ -7,6 +7,8 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
+from paths import urban_anomalies_path
+
 
 class UAAgent(Agent):
     def __init__(self, agent_id, anomalous=False):
@@ -27,7 +29,7 @@ class UrbanAnomalies(Dataset):
 
     def __init__(
         self,
-        path="/data/Datasets/UrbanAnomalies/",
+        path=None,
         method="centralized",
         anomaly_type="combined",
         location="atlanta",
@@ -35,6 +37,9 @@ class UrbanAnomalies(Dataset):
         **kwargs,
     ):
         # TODO: compute non-centralized datasets
+        if path is None:
+            path = urban_anomalies_path()
+
         if manual_path is None:
             self.path = Path(path) / method / f"{location}_{anomaly_type}_outliers"
         else:

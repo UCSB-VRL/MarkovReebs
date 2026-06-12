@@ -12,6 +12,7 @@ import baseline.transforms as transforms
 from baseline import MarkovChain
 
 import tracers
+from paths import ensure_parent
 
 def generate_single_agent_data(sim, output_path, MAX_AGENTS=None, epsilon=1e-4):
     normal_agents = set(range(sim.agent_count)) - set(sim.anomalous_agents)
@@ -56,6 +57,7 @@ def generate_single_agent_data(sim, output_path, MAX_AGENTS=None, epsilon=1e-4):
 
     print(f"Total number of agents: {len(M1)}")
 
+    ensure_parent(output_path)
     with h5py.File(output_path, "w") as f:
         for group, agents in (("M1", M1), ("M2", M2), ("G", G)):
             for k, agent in enumerate(agents):
@@ -63,7 +65,6 @@ def generate_single_agent_data(sim, output_path, MAX_AGENTS=None, epsilon=1e-4):
 
 
 if __name__ == "__main__":
-    from dataloader import Geolife, UrbanAnomalies
+    from dataloader import Geolife
 
     generate_single_agent_data(Geolife(), "outputs/baseline_geolife.h5")
-    generate_single_agent_data(UrbanAnomalies(), "outputs/baseline_ua.h5")

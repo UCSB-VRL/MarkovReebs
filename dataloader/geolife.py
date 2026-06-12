@@ -8,6 +8,8 @@ import numpy as np
 import pandas as pd
 from datetime import datetime, date
 
+from paths import geolife_path
+
 
 class GeolifeAgent(Agent):
     def __init__(self, agent_id):
@@ -30,12 +32,15 @@ class Geolife(Dataset):
 
     def __init__(
         self,
-        path="/data/Datasets/Geolife 1.3/",
+        path=None,
         split_date=(2009, 5, 1),
         rate=10,
         dropout=30,
         **kwargs,
     ):
+        if path is None:
+            path = geolife_path()
+
         self.path = Path(path) / "Data"
         assert self.path.exists(), "Path does not exist."
 

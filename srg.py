@@ -10,6 +10,8 @@ import h5py
 
 import tracers
 import filters
+from paths import ensure_parent
+from reeb_utils import make_pickle_safe
 
 
 def generate_single_agent_data(sim, output_path, MAX_AGENTS=None, epsilon=1e-4):
@@ -38,7 +40,9 @@ def generate_single_agent_data(sim, output_path, MAX_AGENTS=None, epsilon=1e-4):
 
         assert agent_m1.shape[2] == 2, f"Unexpected shape: {agent_m1.shape}"
 
-        agent_reeb = reepy.SequentialReebGraph(epsilon=epsilon, store_trajectories=True)
+        agent_reeb = make_pickle_safe(
+            reepy.SequentialReebGraph(epsilon=epsilon, store_trajectories=True)
+        )
         try:
             agent_reeb.append_trajectories(agent_m1)
         except:
@@ -59,6 +63,7 @@ def generate_single_agent_data(sim, output_path, MAX_AGENTS=None, epsilon=1e-4):
             M2.pop()
             continue
 
+    ensure_parent(output_path)
     with h5py.File(output_path, "w") as f:
         for group, agents in (("M1", M1), ("M2", M2), ("G", G)):
             for k, agent in enumerate(agents):
@@ -66,7 +71,6 @@ def generate_single_agent_data(sim, output_path, MAX_AGENTS=None, epsilon=1e-4):
 
 
 if __name__ == "__main__":
-    from dataloader import Geolife, UrbanAnomalies
+    from dataloader import Geolife
 
-    # generate_single_agent_data(Geolife(), "outputs/srg_geolife.h5")
-    generate_single_agent_data(UrbanAnomalies(), "outputs/srg_ua.h5")
+    generate_single_agent_data(Geolife(), "outputs/srg_geolife.h5")

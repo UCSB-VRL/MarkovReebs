@@ -3,7 +3,10 @@ Generates all figures for plotting
 """
 
 # %% Parameters
-files = ["outputs/srg_ua.h5", "outputs/hrg_geolife.h5"]
+files = [
+    "outputs/srg_geolife.h5",
+    "outputs/hrg_geolife_epsilon=1e-4_alpha=1e-1.h5",
+]
 
 # %% Setup
 import importlib
@@ -86,13 +89,9 @@ Gchart.save("outputs/G.html")
 importlib.reload(histogram)
 
 geolife_histogram = None
-ua_histogram = None
 
 with h5py.File("outputs/time_histogram.h5", "r") as f:
     geolife_histogram = f["geolife"][:]
-    ua_histogram = f["ua"][:]
 
-chart = histogram.plot_time_histogram(ua_histogram, bandwidth=0.25)
-chart.save("outputs/ua_histogram.html")
 chart = histogram.plot_time_histogram(geolife_histogram, bandwidth=0.25, correction=8)
 chart.save("outputs/geolife_histogram.html")

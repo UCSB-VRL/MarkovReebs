@@ -57,10 +57,8 @@ def compute_marg_histogram(
     return frequencies
 
 if __name__ == "__main__":
-    marg_path = "../outputs/MARG_geolife.pkl"
+    marg_path = "../outputs/MARG_geolife_epsilon=1e-4.pkl"
 
     with h5py.File('../outputs/time_histogram.h5', 'w') as f:
         f.create_dataset('geolife',
-                         data=compute_marg_histogram("../outputs/MARG_geolife.pkl"))
-        f.create_dataset('ua',
-                         data=compute_marg_histogram("../outputs/MARG_ua.pkl"))
+                         data=compute_marg_histogram(marg_path))

@@ -11,6 +11,8 @@ from collections import deque
 
 import tracers
 import filters
+from paths import ensure_parent
+from reeb_utils import make_pickle_safe
 
 
 def __reweight_from_terminals_in_place(
@@ -59,6 +61,7 @@ def compute_hybrid_agent_data(
     marg = None
     with open(marg_path, "rb") as f:
         marg = pickle.load(f)
+    make_pickle_safe(marg)
 
     epsilon = marg.epsilon
 
@@ -84,7 +87,9 @@ def compute_hybrid_agent_data(
             print("[WARN] Skipping agent", agent_id)
             continue
 
-        agent_reeb = reepy.SequentialReebGraph(epsilon=epsilon, store_trajectories=True)
+        agent_reeb = make_pickle_safe(
+            reepy.SequentialReebGraph(epsilon=epsilon, store_trajectories=True)
+        )
         try:
             agent_reeb.append_trajectories(agent.samples())
         except:
@@ -204,6 +209,7 @@ def compute_hybrid_agent_data(
             M2.pop()
             continue
 
+    ensure_parent(output_path)
     with h5py.File(output_path, "w") as f:
         for group, agents in (("M1", M1), ("M2", M2), ("G", G)):
             for k, agent in enumerate(agents):

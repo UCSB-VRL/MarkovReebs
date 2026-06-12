@@ -5,11 +5,25 @@ results.
 
 import h5py
 import numpy as np
-from pprint import pprint
+from pathlib import Path
+from pprint import pformat, pprint
 
 import evaluation.trajectory_stats as stats
 import evaluation.metrics as metrics
 import evaluation.table as table
+
+
+def write_table_log(output_table, log_path="outputs/table.log"):
+    log_path = Path(log_path)
+    log_path.parent.mkdir(parents=True, exist_ok=True)
+
+    with log_path.open("w") as f:
+        for dataset, records in output_table.items():
+            f.write(f"Dataset: {dataset}\n")
+            f.write(pformat(records))
+            f.write("\n\n")
+
+    return log_path
 
 
 def trim(M1, M2, G, start=0, end=-1):
@@ -64,7 +78,6 @@ def compute_scores(statistics, mode="agent", comparison="MAE"):
 
 def eval():
     datasets = [
-        ("ua", None), 
         ("geolife", (4500, 7000))
     ]
     modes = ["agent", "population"]
@@ -113,7 +126,6 @@ def eval():
 
 def ablation():
     datasets = [
-        ("ua", None), 
         ("geolife", (4500, 7000))
     ]
     resolutions = [
@@ -168,7 +180,15 @@ def ablation():
     return output_table
 
 if __name__ == "__main__":
-    from pprint import pprint
     output_table = ablation()
     pprint(output_table)
 
+    log_path = write_table_log(output_table)
+    typst_table = table.generate_typst_table(log_path)
+
+    output_path = Path("outputs/generated_results.typ")
+    output_path.write_text(typst_table)
+
+    print(f"Wrote evaluation log to {log_path}")
+    print(f"Wrote generated table to {output_path}")
+    print(typst_table)
